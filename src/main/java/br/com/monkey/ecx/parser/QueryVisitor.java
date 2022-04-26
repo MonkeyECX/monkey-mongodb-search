@@ -19,6 +19,8 @@ class QueryVisitor<T> extends QueryBaseVisitor<MonkeyCriteria> {
 
 	private final Pattern REGEX = Pattern.compile("^(\\*?)(.+?)(\\*?)$");
 
+	private final Pattern BOOLEAN = Pattern.compile("true|false", Pattern.CASE_INSENSITIVE);
+
 	private static final Map<SearchOperation, Function<SearchCriteria, MonkeyCriteria>> FILTER_CRITERIA = new HashMap<>();
 
 	// Create map of filter
@@ -30,9 +32,9 @@ class QueryVisitor<T> extends QueryBaseVisitor<MonkeyCriteria> {
 		FILTER_CRITERIA.put(LESS_THAN_EQUAL,
 				condition -> MonkeyCriteria.where(condition.getKey()).lte(condition.getValue()));
 		FILTER_CRITERIA.put(CONTAINS,
-				condition -> MonkeyCriteria.where(condition.getKey()).regex(condition.getValue()));
+				condition -> MonkeyCriteria.where(condition.getKey()).regex(condition.getValueAsString()));
 		FILTER_CRITERIA.put(NOT_CONTAINS,
-				condition -> MonkeyCriteria.where(condition.getKey()).not().regex(condition.getValue()));
+				condition -> MonkeyCriteria.where(condition.getKey()).not().regex(condition.getValueAsString()));
 	}
 
 	@Override

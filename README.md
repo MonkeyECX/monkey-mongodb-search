@@ -50,7 +50,22 @@ Second step: you need annotate your domain configuration class or your main clas
 @EnableMongoRepositories(basePackages = "br.com.monkey.ecx", repositoryBaseClass = ResourceRepositoryImpl.class)
 ``` 
 
-Third step: your repository needs to extends ResourceRepository like this:
+Third step: Define the configuration class, at DomainConfiguration:
+
+Here you can configure:
+
+The prohibited fields, and this causes error when someone tries to use that field on the search parameter.
+
+If search will use program in all queries and the name of the program field to be used. If you do not specify the program field will be program.
+
+```java
+@PostConstruct
+void started() {
+    MongoDBSearchConfiguration.configure(Collections.singletonList("companyId"), true);
+}
+``` 
+
+`ourth step: your repository needs to extends ResourceRepository like this:
 
 ```java
 interface MyRepository

@@ -25,7 +25,7 @@ public class CriteriaParser<T> {
 			monkeyCriteria = new MonkeyCriteria().andOperator(visit.getCriteriaAndClause());
 		}
 		else if (!CollectionUtils.isEmpty(visit.getCriteriaOrClause())) {
-			monkeyCriteria = new MonkeyCriteria().andOperator(visit.getCriteriaOrClause());
+			monkeyCriteria = new MonkeyCriteria().orOperator(visit.getCriteriaOrClause());
 		}
 		else if (!visit.getCriteriaObject().isEmpty()) {
 			return new Query(visit);
