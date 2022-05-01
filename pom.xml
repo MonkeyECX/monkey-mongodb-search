@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.4</version>
+        <version>2.6.7</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>br.com.monkey.ecx</groupId>
     <artifactId>monkey-mongodb-search</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
     <name>monkey-mongodb-search</name>
     <description>Monkey MongoDB Search</description>
     <properties>
