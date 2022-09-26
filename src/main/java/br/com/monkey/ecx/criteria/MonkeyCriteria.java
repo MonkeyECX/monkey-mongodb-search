@@ -896,6 +896,11 @@ public class MonkeyCriteria implements CriteriaDefinition {
 		return this.key;
 	}
 
+	@Nullable
+	public void setKey(String key) {
+		this.key = key;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 *

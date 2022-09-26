@@ -2,6 +2,8 @@ package br.com.monkey.ecx.parser;
 
 import br.com.monkey.ecx.QueryBaseVisitor;
 import br.com.monkey.ecx.QueryParser;
+import br.com.monkey.ecx.configuration.Alias;
+import br.com.monkey.ecx.configuration.MongoDBSearchConfiguration;
 import br.com.monkey.ecx.criteria.MonkeyCriteria;
 import br.com.monkey.ecx.criteria.SearchCriteria;
 import br.com.monkey.ecx.criteria.SearchOperation;
@@ -14,12 +16,12 @@ import java.util.regex.Pattern;
 
 import static br.com.monkey.ecx.criteria.SearchOperation.*;
 import static java.util.Objects.nonNull;
+import static org.springframework.util.CollectionUtils.isEmpty;
+import static org.springframework.util.StringUtils.hasText;
 
 class QueryVisitor<T> extends QueryBaseVisitor<MonkeyCriteria> {
 
 	private final Pattern REGEX = Pattern.compile("^(\\*?)(.+?)(\\*?)$");
-
-	private final Pattern BOOLEAN = Pattern.compile("true|false", Pattern.CASE_INSENSITIVE);
 
 	private static final Map<SearchOperation, Function<SearchCriteria, MonkeyCriteria>> FILTER_CRITERIA = new HashMap<>();
 
@@ -58,15 +60,35 @@ class QueryVisitor<T> extends QueryBaseVisitor<MonkeyCriteria> {
 		MonkeyCriteria right = visit(ctx.right);
 		String op = ctx.logicalOp.getText();
 
+		MonkeyCriteria criteria;
 		if (op.equalsIgnoreCase(SearchOperation.AND)) {
-			return left.addAndClause(left).addAndClause(right);
+			if (left.getCriteriaAndClause().isEmpty() && left.getCriteriaOrClause().isEmpty()
+					&& hasText(left.getKey())) {
+				left.addAndClause(left);
+			}
+			right.getCriteriaOrClause().forEach(left::addOrClause);
+			right.getCriteriaAndClause().forEach(left::addAndClause);
+			left.addAndClause(right);
+			criteria = new MonkeyCriteria();
+			left.getCriteriaOrClause().forEach(criteria::addOrClause);
+			left.getCriteriaAndClause().forEach(criteria::addAndClause);
 		}
 		else if (op.equalsIgnoreCase(SearchOperation.OR)) {
-			return left.addOrClause(left).addOrClause(right);
+			if (left.getCriteriaAndClause().isEmpty() && left.getCriteriaOrClause().isEmpty()
+					&& hasText(left.getKey())) {
+				left.addOrClause(left);
+			}
+			right.getCriteriaOrClause().forEach(left::addOrClause);
+			right.getCriteriaAndClause().forEach(left::addAndClause);
+			left.addOrClause(right);
+			criteria = new MonkeyCriteria();
+			left.getCriteriaOrClause().forEach(criteria::addOrClause);
+			left.getCriteriaAndClause().forEach(criteria::addAndClause);
 		}
 		else {
 			return left.addAndClause(left).addAndClause(right);
 		}
+		return criteria;
 	}
 
 	@Override
@@ -97,7 +119,28 @@ class QueryVisitor<T> extends QueryBaseVisitor<MonkeyCriteria> {
 			throw new IllegalArgumentException("Invalid function param type: ");
 		}
 
-		return function.apply(condition);
+		MonkeyCriteria apply = function.apply(condition);
+
+		MongoDBSearchConfiguration.getInstance().getAliases().stream()
+				.filter(alias -> alias.getAlias().equals(apply.getKey())).findFirst().ifPresent(alias -> {
+					apply.setKey(alias.getKey());
+					addCombinedCondition(condition, apply, alias);
+				});
+
+		return apply;
+	}
+
+	private static void addCombinedCondition(SearchCriteria condition, MonkeyCriteria apply, Alias alias) {
+		if (!isEmpty(alias.getCombinedKey())) {
+			alias.getCombinedKey().forEach(c -> {
+				SearchCriteria combinedCriteria = new SearchCriteria(c.getKey(), condition.getOperation().name(), null,
+						condition.getValueAsString(), null);
+				Function<SearchCriteria, MonkeyCriteria> functionCombined = FILTER_CRITERIA
+						.get(condition.getOperation());
+				MonkeyCriteria combined = functionCombined.apply(combinedCriteria);
+				apply.addOrClause(apply).addOrClause(combined);
+			});
+		}
 	}
 
 }
