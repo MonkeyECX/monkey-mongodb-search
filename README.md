@@ -65,7 +65,7 @@ void started() {
 }
 ``` 
 
-Version 2:
+<h4 id="lombok">Version 2</h4>
 
 We added two new configurations, to configure alias keys and monetary values. Look at the details:
 
