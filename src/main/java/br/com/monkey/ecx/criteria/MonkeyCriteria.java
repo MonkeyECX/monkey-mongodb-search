@@ -30,6 +30,7 @@ import org.springframework.data.mongodb.core.geo.GeoJson;
 import org.springframework.data.mongodb.core.geo.Sphere;
 import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.GeoCommand;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.schema.JsonSchemaObject.Type;
 import org.springframework.data.mongodb.core.schema.JsonSchemaProperty;
 import org.springframework.data.mongodb.core.schema.MongoJsonSchema;
@@ -67,7 +68,12 @@ public class MonkeyCriteria implements CriteriaDefinition {
 	 */
 	private static final Object NOT_SET = new Object();
 
+	private static final String DEFAULT_PRIORITY_GROUP = "DEFAULT";
+
 	private @Nullable String key;
+
+	@Getter
+	private String priorityGroup = DEFAULT_PRIORITY_GROUP;
 
 	private List<MonkeyCriteria> criteriaChain;
 
@@ -80,16 +86,6 @@ public class MonkeyCriteria implements CriteriaDefinition {
 
 	@Getter
 	private Set<MonkeyCriteria> criteriaOrClause = new HashSet<>();
-
-	public MonkeyCriteria addAndClause(MonkeyCriteria criteria) {
-		this.criteriaAndClause.add(criteria);
-		return this;
-	}
-
-	public MonkeyCriteria addOrClause(MonkeyCriteria criteria) {
-		this.criteriaOrClause.add(criteria);
-		return this;
-	}
 
 	public MonkeyCriteria() {
 		this.criteriaChain = new ArrayList<MonkeyCriteria>();
@@ -105,6 +101,26 @@ public class MonkeyCriteria implements CriteriaDefinition {
 		this.criteriaChain = criteriaChain;
 		this.criteriaChain.add(this);
 		this.key = key;
+	}
+
+	public MonkeyCriteria addAndClause(MonkeyCriteria criteria) {
+		this.criteriaAndClause.add(criteria);
+		return this;
+	}
+
+	public MonkeyCriteria addOrClause(MonkeyCriteria criteria) {
+		this.criteriaOrClause.add(criteria);
+		return this;
+	}
+
+	public MonkeyCriteria withPriorityGroup(String id) {
+		this.criteriaAndClause.forEach(item -> item.priorityGroup = id);
+		this.criteriaOrClause.forEach(item -> item.priorityGroup = id);
+		return this;
+	}
+
+	public boolean isDefaultPriorityGroup() {
+		return this.priorityGroup.equals(DEFAULT_PRIORITY_GROUP);
 	}
 
 	/**
