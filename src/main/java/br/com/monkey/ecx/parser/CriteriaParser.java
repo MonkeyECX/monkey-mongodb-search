@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.groupingBy;
-import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class CriteriaParser<T> {
 
@@ -29,9 +28,6 @@ public class CriteriaParser<T> {
 
 		if (criteriaList.isEmpty()) {
 			return new Query(criteria);
-		}
-		else if (isEmpty(criteria.getCriteriaAndClause())) {
-			return new Query(new MonkeyCriteria().orOperator(criteriaList));
 		}
 		else {
 			return new Query(new MonkeyCriteria().andOperator(criteriaList));
