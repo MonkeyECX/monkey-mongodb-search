@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static br.com.monkey.ecx.core.MongoIdGenerator.generateId;
 import static br.com.monkey.ecx.criteria.SearchOperation.*;
 import static java.util.Objects.nonNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -51,7 +52,7 @@ class QueryVisitor<T> extends QueryBaseVisitor<MonkeyCriteria> {
 
 	@Override
 	public MonkeyCriteria visitPriorityQuery(QueryParser.PriorityQueryContext ctx) {
-		return visit(ctx.query());
+		return visit(ctx.query()).withPriorityGroup(generateId());
 	}
 
 	@Override
@@ -68,7 +69,9 @@ class QueryVisitor<T> extends QueryBaseVisitor<MonkeyCriteria> {
 			}
 			right.getCriteriaOrClause().forEach(left::addOrClause);
 			right.getCriteriaAndClause().forEach(left::addAndClause);
-			left.addAndClause(right);
+			if (right.isDefaultPriorityGroup()) {
+				left.addAndClause(right);
+			}
 			criteria = new MonkeyCriteria();
 			left.getCriteriaOrClause().forEach(criteria::addOrClause);
 			left.getCriteriaAndClause().forEach(criteria::addAndClause);
@@ -80,7 +83,9 @@ class QueryVisitor<T> extends QueryBaseVisitor<MonkeyCriteria> {
 			}
 			right.getCriteriaOrClause().forEach(left::addOrClause);
 			right.getCriteriaAndClause().forEach(left::addAndClause);
-			left.addOrClause(right);
+			if (right.isDefaultPriorityGroup()) {
+				left.addOrClause(right);
+			}
 			criteria = new MonkeyCriteria();
 			left.getCriteriaOrClause().forEach(criteria::addOrClause);
 			left.getCriteriaAndClause().forEach(criteria::addAndClause);
@@ -138,7 +143,7 @@ class QueryVisitor<T> extends QueryBaseVisitor<MonkeyCriteria> {
 				Function<SearchCriteria, MonkeyCriteria> functionCombined = FILTER_CRITERIA
 						.get(condition.getOperation());
 				MonkeyCriteria combined = functionCombined.apply(combinedCriteria);
-				apply.addOrClause(apply).addOrClause(combined);
+				apply.addOrClause(apply).addOrClause(combined).withPriorityGroup(alias.getAlias());
 			});
 		}
 	}
