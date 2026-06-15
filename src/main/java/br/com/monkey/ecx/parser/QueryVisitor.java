@@ -121,22 +121,19 @@ class QueryVisitor<T> extends QueryBaseVisitor<MonkeyCriteria> {
 		switch (operation) {
 		case EQUAL:
 			if (ValueParser.isDateOnly(value)) {
-				return new MonkeyCriteria().andOperator(
-						MonkeyCriteria.where(key).gte(ValueParser.startOfDay(value)),
+				return new MonkeyCriteria().andOperator(MonkeyCriteria.where(key).gte(ValueParser.startOfDay(value)),
 						MonkeyCriteria.where(key).lt(ValueParser.nextDayStartOfDay(value)));
 			}
 
 			if (ValueParser.isDateTimeToMinute(value)) {
-				return new MonkeyCriteria().andOperator(
-						MonkeyCriteria.where(key).gte(ValueParser.startOfMinute(value)),
+				return new MonkeyCriteria().andOperator(MonkeyCriteria.where(key).gte(ValueParser.startOfMinute(value)),
 						MonkeyCriteria.where(key).lt(ValueParser.nextMinute(value)));
 			}
 			return MonkeyCriteria.where(key).is(ValueParser.parseToDate(value));
 
 		case NOT:
 			if (ValueParser.isDateOnly(value)) {
-				return new MonkeyCriteria().orOperator(
-						MonkeyCriteria.where(key).lt(ValueParser.startOfDay(value)),
+				return new MonkeyCriteria().orOperator(MonkeyCriteria.where(key).lt(ValueParser.startOfDay(value)),
 						MonkeyCriteria.where(key).gte(ValueParser.nextDayStartOfDay(value)));
 			}
 			return MonkeyCriteria.where(key).ne(ValueParser.parseToDate(value));

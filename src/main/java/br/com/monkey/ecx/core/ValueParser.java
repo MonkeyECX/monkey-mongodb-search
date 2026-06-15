@@ -10,9 +10,9 @@ import static br.com.monkey.ecx.core.MongoSearchGovernmentIdUtils.isValidGovernm
 
 public class ValueParser {
 
-    static Pattern BOOLEAN = Pattern.compile("true|false", Pattern.CASE_INSENSITIVE);
+	static Pattern BOOLEAN = Pattern.compile("true|false", Pattern.CASE_INSENSITIVE);
 
-    static Pattern NUMBER = Pattern.compile("-?\\d+(\\.\\d+)?");
+	static Pattern NUMBER = Pattern.compile("-?\\d+(\\.\\d+)?");
 
 	public static boolean isTemporal(String rawValue) {
 		if (rawValue == null || rawValue.trim().isEmpty()) {
@@ -103,36 +103,36 @@ public class ValueParser {
 		}
 	}
 
-    public static Object convertScalarValue(String value) {
-        String monetaryIdentification = getInstance().getMonetaryIdentification();
+	public static Object convertScalarValue(String value) {
+		String monetaryIdentification = getInstance().getMonetaryIdentification();
 
-        if (isValidGovernmentId(value)) {
-            return value;
-        }
+		if (isValidGovernmentId(value)) {
+			return value;
+		}
 
-        if (value.startsWith(monetaryIdentification)) {
-            return value.replace(monetaryIdentification, "");
-        }
+		if (value.startsWith(monetaryIdentification)) {
+			return value.replace(monetaryIdentification, "");
+		}
 
-        if (BOOLEAN.matcher(value).matches()) {
-            return Boolean.valueOf(value);
-        }
+		if (BOOLEAN.matcher(value).matches()) {
+			return Boolean.valueOf(value);
+		}
 
-        if (NUMBER.matcher(value).matches()) {
-            try {
-                return Integer.valueOf(value);
-            }
-            catch (NumberFormatException ignored) {
-            }
+		if (NUMBER.matcher(value).matches()) {
+			try {
+				return Integer.valueOf(value);
+			}
+			catch (NumberFormatException ignored) {
+			}
 
-            try {
-                return Long.valueOf(value);
-            }
-            catch (NumberFormatException ignored) {
-            }
-            return Double.valueOf(value);
-        }
-        return value;
-    }
+			try {
+				return Long.valueOf(value);
+			}
+			catch (NumberFormatException ignored) {
+			}
+			return Double.valueOf(value);
+		}
+		return value;
+	}
 
 }
