@@ -23,7 +23,9 @@ key
    ;
 
 value
-   : IDENTIFIER
+   : DATETIME
+   | DATE
+   | IDENTIFIER
    | STRING
    | ENCODED_STRING
    | NUMBER
@@ -31,7 +33,9 @@ value
    ;
 
 op
-   : EQ
+   : GTE
+   | LTE
+   | EQ
    | GT
    | LT
    | NOT_EQ
@@ -116,12 +120,22 @@ LPAREN
 RPAREN
    : ')'
    ;
+GTE
+   : '>='
+   ;
+
+LTE
+   : '<='
+   ;
+
 GT
    : '>'
    ;
+
 LT
    : '<'
    ;
+
 EQ
    : ':'
    ;
@@ -142,4 +156,19 @@ LineTerminator
 ;
 WS
     : [ \t\r\n]+ -> skip
+   ;
+
+DATETIME
+   : DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT 'T'
+     DIGIT DIGIT ':' DIGIT DIGIT
+     ( ':' DIGIT DIGIT ( '.' DIGIT+ )? )?
+     ( 'Z' | [+\-] DIGIT DIGIT ':' DIGIT DIGIT )?
+   ;
+
+DATE
+   : DIGIT DIGIT DIGIT DIGIT '-' DIGIT DIGIT '-' DIGIT DIGIT
+   ;
+
+fragment DIGIT
+   : [0-9]
    ;
