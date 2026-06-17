@@ -2,7 +2,7 @@ package br.com.monkey.ecx.criteria;
 
 public enum SearchOperation {
 
-	EQUAL, NOT, GREATER_THAN_EQUAL, LESS_THAN_EQUAL, CONTAINS, NOT_CONTAINS;
+	EQUAL, NOT, GREATER_THAN, GREATER_THAN_EQUAL, LESS_THAN, LESS_THAN_EQUAL, CONTAINS, NOT_CONTAINS;
 
 	public static final String LIKE = "*";
 

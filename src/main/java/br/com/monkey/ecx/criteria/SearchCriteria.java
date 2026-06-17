@@ -1,18 +1,15 @@
 package br.com.monkey.ecx.criteria;
 
-import br.com.monkey.ecx.configuration.MongoDBSearchConfiguration;
 import br.com.monkey.ecx.core.exception.BadRequestException;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.regex.Pattern;
 
+import static br.com.monkey.ecx.configuration.MongoDBSearchConfiguration.getInstance;
 import static lombok.AccessLevel.NONE;
 
 @Getter
 public class SearchCriteria implements Serializable {
-
-	Pattern BOOLEAN = Pattern.compile("true|false", Pattern.CASE_INSENSITIVE);
 
 	private String key;
 
@@ -25,7 +22,7 @@ public class SearchCriteria implements Serializable {
 
 	public SearchCriteria(final String key, final String operation, String prefix, final String value, String suffix) {
 
-		if (MongoDBSearchConfiguration.getInstance().getProhibitedFields().contains(key)) {
+		if (getInstance().getProhibitedFields().contains(key)) {
 			throw new BadRequestException("The field: " + key + " can't be used in query search.");
 		}
 
@@ -59,23 +56,6 @@ public class SearchCriteria implements Serializable {
 		this.key = key;
 		this.operation = op;
 		this.value = value;
-	}
-
-	public SearchCriteria changeKey(String key) {
-		this.key = key;
-		return this;
-	}
-
-	public SearchCriteria addEnumValue(Enum enumValue) {
-		this.enumValue = enumValue;
-		return this;
-	}
-
-	public Object getValue() {
-		if (BOOLEAN.matcher(value).matches()) {
-			return Boolean.valueOf(value);
-		}
-		return value;
 	}
 
 	public String getValueAsString() {

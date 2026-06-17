@@ -27,6 +27,11 @@ public class ResourceRepositoryImpl<T, I extends Serializable> extends SimpleMon
 	}
 
 	@Override
+	public List<T> findAll(Query query) {
+		return mongoOperations.find(query, entityInformation.getJavaType(), entityInformation.getCollectionName());
+	}
+
+	@Override
 	public Page<T> findAll(final Query query, final Pageable pageable) {
 		Assert.notNull(query, "Query must not be null.");
 		long total = mongoOperations.count(query, entityInformation.getJavaType(),

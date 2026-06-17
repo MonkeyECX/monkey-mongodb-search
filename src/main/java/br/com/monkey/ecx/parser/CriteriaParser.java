@@ -6,31 +6,32 @@ import br.com.monkey.ecx.criteria.MonkeyCriteria;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static java.util.stream.Collectors.groupingBy;
 
 public class CriteriaParser<T> {
 
 	private final QueryVisitor<T> visitor = new QueryVisitor<>();
 
 	public Query parse(String search) {
-		QueryParser parser = getParser(search);
-		MonkeyCriteria visit = visitor.visit(parser.input());
-		MonkeyCriteria monkeyCriteria = new MonkeyCriteria();
-		if (!CollectionUtils.isEmpty(visit.getCriteriaOrClause())
-				&& !CollectionUtils.isEmpty(visit.getCriteriaAndClause())) {
-			monkeyCriteria = new MonkeyCriteria().andOperator(visit.getCriteriaAndClause())
-					.orOperator(visit.getCriteriaOrClause());
+		MonkeyCriteria criteria = visitor.visit(getParser(search).input());
+		List<MonkeyCriteria> criteriaList = new ArrayList<>();
+
+		criteria.getCriteriaOrClause().stream().collect(groupingBy(MonkeyCriteria::getPriorityGroup))
+				.forEach((key, value) -> criteriaList.add(new MonkeyCriteria().orOperator(value)));
+
+		criteria.getCriteriaAndClause().stream().collect(groupingBy(MonkeyCriteria::getPriorityGroup))
+				.forEach((key, value) -> criteriaList.add(new MonkeyCriteria().andOperator(value)));
+
+		if (criteriaList.isEmpty()) {
+			return new Query(criteria);
 		}
-		else if (!CollectionUtils.isEmpty(visit.getCriteriaAndClause())) {
-			monkeyCriteria = new MonkeyCriteria().andOperator(visit.getCriteriaAndClause());
+		else {
+			return new Query(new MonkeyCriteria().andOperator(criteriaList));
 		}
-		else if (!CollectionUtils.isEmpty(visit.getCriteriaOrClause())) {
-			monkeyCriteria = new MonkeyCriteria().orOperator(visit.getCriteriaOrClause());
-		}
-		else if (!visit.getCriteriaObject().isEmpty()) {
-			return new Query(visit);
-		}
-		return new Query(monkeyCriteria);
 	}
 
 	private QueryParser getParser(String search) {
