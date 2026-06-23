@@ -18,7 +18,7 @@
 
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <antlr4-runtime.version>4.7.2</antlr4-runtime.version>
-        <monkey.government.id.utils.version>1.0.1</monkey.government.id.utils.version>
+        <monkey.government.id.utils.version>1.0.2</monkey.government.id.utils.version>
 
         <spring-javaformat.version>0.0.25</spring-javaformat.version>
     </properties>
