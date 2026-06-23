@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.regex.Pattern;
 
 import static br.com.monkey.ecx.configuration.MongoDBSearchConfiguration.getInstance;
-import static br.com.monkey.ecx.core.MongoSearchGovernmentIdUtils.isValidGovernmentId;
+import static br.com.monkey.sdk.GovernmentIdUtils.isValidGovernmentId;
 
 public class ValueParser {
 
