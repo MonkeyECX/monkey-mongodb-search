@@ -1,0 +1,29 @@
+engines:
+  duplication:
+    enabled: true
+    exclude_paths:
+      - '**/*Test.java'
+      - '**/*WebBase.java'
+      - '**/*RestService.java'
+exclude_paths:
+  - '**/test/resources/contracts/**'
+  - '**/system**'
+  - '**/configuration**'
+  - '**/core**'
+  - '**/test/java/br/com/monkey/ecx/templates**'
+  - '**/test/java/br/com/monkey/ecx/support**'
+  - '**/*Application.java'
+  - '**/*Enum.java'
+  - '**/*Builder.java'
+  - '**/*Resource.java'
+  - '**/*Response.java'
+  - '**/*Specification.java'
+  - '**/*Links.java'
+  - '**/*TemplateLoader.java'
+  - '**/db/**'
+  - 'docs/**'
+  - 'pull_request_template.md'
+  - 'README.md'
+  - 'ai-context/**'
+  - 'AGENTS.md'
+  - 'CLAUDE.md'
